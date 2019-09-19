@@ -1,4 +1,4 @@
-# WIP Cache-Invalidation-CDC
+# WIP - Cache-Invalidation-CDC
 
 ## What is CDC 
 Change data capture (CDC) is the process of capturing changes made at the data source and applying them throughout the enterprise applications.
