@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(url = "http://localhost:6060/")
+@FeignClient(name = "customer-service",url = "http://localhost:5050/")
 public interface CustomerAdapter {
 
     @RequestMapping(method = RequestMethod.GET, value = "/customer/{customerId}")
