@@ -41,13 +41,11 @@ docker run -it --rm --name connect -p 8083:8083 -e GROUP_ID=1 -e CONFIG_STORAGE_
 ```
 
 Now bind kafka-connector with postgres
-
 ```
 curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d '{"name":"customer-connector","config":{"connector.class":"io.debezium.connector.postgresql.PostgresConnector","tasks.max":"1","database.hostname":"10.151.24.253","database.port":"54320","database.user":"postgres","database.password":"","database.dbname":"postgres","database.server.name":"postgres","schema.whitelist":"customer","database.history.kafka.bootstrap.servers":"kafka:9092","database.history.kafka.topic":"dbhistory.customer"}}'
 ``` 
 
 Check connector configuration 
-
 ```$xslt
 curl -H "Accept:application/json" localhost:8083/connectors/customer-connector
 ```
@@ -66,6 +64,5 @@ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 
 ```
 curl -H "Accept:application/json" localhost:8083/connectors/customer-service-connector
 ```
-
 
 WIP....
