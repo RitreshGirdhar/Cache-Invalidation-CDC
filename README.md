@@ -1,4 +1,4 @@
-# WIP - Cache-Invalidation-CDC
+# Cache-Invalidation-CDC
 
 ## What is CDC 
 Change data capture (CDC) is the process of capturing changes made at the data source and applying them throughout the enterprise applications.
@@ -65,4 +65,4 @@ curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" 
 curl -H "Accept:application/json" localhost:8083/connectors/customer-service-connector
 ```
 
-WIP....
+Thanks for reading, happy learning.
