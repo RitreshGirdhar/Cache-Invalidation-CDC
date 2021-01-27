@@ -22,49 +22,59 @@ To capture event we need to set up
 3. kafka-connect
 4. Database Mysql
 
-Start postgres
-```$xslt
-docker run -d --name postgres -v /Users/ritgirdh/Desktop/tools/postgres:/var/lib/postgresql/data -p 54320:5432 postgres:11
+Start Mysql
+```
+docker run -it --rm --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=debezium -e MYSQL_USER=mysqluser -e MYSQL_PASSWORD=mysqlpw debezium/example-mysql:1.4
 ```
 
 Start zookeeper
-```$xslt
-docker run -it --rm --name zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 debezium/zookeeper:0.9
+```
+docker run -it --rm --name zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 debezium/zookeeper:1.4
 ```
 
 start kafka
-```$xslt
-docker run -it --rm --name kafka -p 9092:9092 --link zookeeper:zookeeper debezium/kafka:0.9
+```
+docker run -it --rm --name kafka -p 9092:9092 --link zookeeper:zookeeper debezium/kafka:1.4
 ```
 
 start kafka-connect 
 ```
-docker run -it --rm --name connect -p 8083:8083 -e GROUP_ID=1 -e CONFIG_STORAGE_TOPIC=customer-changes -e OFFSET_STORAGE_TOPIC=customer-changes-offset -e STATUS_STORAGE_TOPIC=customer_changes_statuses --link zookeeper:zookeeper --link postgres:postgres --link kafka:kafka debezium/connect:0.9
+docker run -it --rm --name connect -p 8083:8083 -e GROUP_ID=1 -e CONFIG_STORAGE_TOPIC=my_connect_configs -e OFFSET_STORAGE_TOPIC=my_connect_offsets -e STATUS_STORAGE_TOPIC=my_connect_statuses --link zookeeper:zookeeper --link kafka:kafka --link mysql:mysql debezium/connect:1.4
 ```
 
-Now bind kafka-connector with postgres
-```
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d '{"name":"customer-connector","config":{"connector.class":"io.debezium.connector.postgresql.PostgresConnector","tasks.max":"1","database.hostname":"10.151.24.253","database.port":"54320","database.user":"postgres","database.password":"","database.dbname":"postgres","database.server.name":"postgres","schema.whitelist":"customer","database.history.kafka.bootstrap.servers":"kafka:9092","database.history.kafka.topic":"dbhistory.customer"}}'
-``` 
-
-Check connector configuration 
+Check Kafka connect service 
 ```$xslt
-curl -H "Accept:application/json" localhost:8083/connectors/customer-connector
+curl -H "Accept:application/json" localhost:8083/
+{"version":"2.6.0","commit":"cb8625948210849f"} 
+```
+
+List kafka connect connectors
+```
+curl -H "Accept:application/json" localhost:8083/connectors/
+[]
+```
+
+Registering connector to the database
+
+```$
+curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d '{ "name": "inventory-connector", "config": { "connector.class": "io.debezium.connector.mysql.MySqlConnector", "tasks.max": "1", "database.hostname": "mysql", "database.port": "3306", "database.user": "debezium", "database.password": "dbz", "database.server.id": "184054", "database.server.name": "dbserver1", "database.include.list": "inventory", "database.history.kafka.bootstrap.servers": "kafka:9092", "database.history.kafka.topic": "dbhistory.inventory" } }'
+```
+
+Verify Connectors
+```
+curl -i -X GET -H "Accept:application/json" localhost:8083/connectors/inventory-connector
+HTTP/1.1 200 OK
+Date: Wed, 27 Jan 2021 16:02:43 GMT
+Content-Type: application/json
+Content-Length: 535
+Server: Jetty(9.4.33.v20201020)
+
+{"name":"inventory-connector","config":{"connector.class":"io.debezium.connector.mysql.MySqlConnector","database.user":"root","database.server.id":"184054","tasks.max":"1","database.hostname":"mysql","database.password":"debezium","database.history.kafka.bootstrap.servers":"kafka:9092","database.history.kafka.topic":"dbhistory.inventory","name":"inventory-connector","database.server.name":"dbserver1","database.port":"3306","database.include.list":"inventory"},"tasks":[{"connector":"inventory-connector","task":0}],"type":"source"}
 ```
 
 Watch Kafka topic
-```$xslt
-docker run -it --name watcher --rm --link zookeeper:zookeeper --link kafka:kafka debezium/kafka:0.9 watch-topic -a -k customer-changes
 ```
-
-bind Postgres with kafka-connect
-
-```$xslt
-curl -i -X POST -H "Accept:application/json" -H "Content-Type:application/json" localhost:8083/connectors/ -d '{"name":"customer-service-connector","config":{"connector.class":"io.debezium.connector.postgresql.PostgresConnector","tasks.max":"1","database.hostname":"10.151.24.253","database.port":"54320","database.user":"postgres","database.password":"","database.dbname":"postgres","database.server.name":"postgres","schema.whitelist":"customer","database.history.kafka.bootstrap.servers":"kafka:9092","database.history.kafka.topic":"customer-service-history"}}'
-```
-
-```
-curl -H "Accept:application/json" localhost:8083/connectors/customer-service-connector
+docker run -it --rm --name watcher --link zookeeper:zookeeper --link kafka:kafka debezium/kafka:1.4 watch-topic -a -k dbserver1.inventory.customers
 ```
 
 Thanks for reading, happy learning.
