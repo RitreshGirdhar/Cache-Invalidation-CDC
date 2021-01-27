@@ -1,1 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
+.idea/codeStyles/
+.idea/dbnavigator.xml
+.idea/sonarlint/
+.gitignore
+cache-invalidation-cdc.iml
