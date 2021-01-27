@@ -3,6 +3,7 @@
 ## What is CDC 
 Change data capture (CDC) is the process of capturing changes made at the data source and applying them throughout the enterprise applications.
 
+
 ### Scenario could be Cache invalidation 
 
 Suppose you have two microservices in your application,say Customer(MS1) and Invoice (MS2). 
@@ -19,7 +20,7 @@ To capture event we need to set up
 1. Zookeeper
 2. Kafka
 3. kafka-connect
-4. Database postgress
+4. Database Mysql
 
 Start postgres
 ```$xslt
