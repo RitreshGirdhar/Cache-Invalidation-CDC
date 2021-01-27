@@ -2,5 +2,5 @@ FROM openjdk:8-jdk-alpine
 VOLUME /tmp
 #ARG JAR_FILE
 ADD target/customerservice.jar application.jar
-EXPOSE 5050
+EXPOSE 6060
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","application.jar"]

@@ -94,6 +94,16 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.3.6</version>
+				<configuration>
+					<buildArgs>
+						<JAR_FILE>target/customerservice.jar</JAR_FILE>
+					</buildArgs>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
