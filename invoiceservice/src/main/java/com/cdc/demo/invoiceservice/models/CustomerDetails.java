@@ -8,6 +8,7 @@ import lombok.*;
 @Builder
 @NonNull
 public class CustomerDetails {
+
     private String name;
     private String address;
     private String id;
